@@ -3,15 +3,24 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "dev": "vite"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.14",
+    "@types/node": "^25.6.0",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "hono": "^4.12.14",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
-    "mysql": "^2.17.1"
+    "mysql": "^2.17.1",
+    "mysql2": "^3.22.1",
+    "vite": "^8.0.8"
+  },
+  "devDependencies": {
+    "@hono/vite-dev-server": "^0.25.1"
   }
 }
