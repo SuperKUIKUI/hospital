@@ -619,7 +619,7 @@ app.get("/showDiagnoses", async (c) => {
 });
 
 app.get("/allDrugs", async (c) => {
-    const fetchDrugs = () => pool.execute("SELECT * FROM medications");
+    const fetchDrugs = () => pool.execute("SELECT * FROM Medications");
     const timeout = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Database timeout")), 10000),
     );

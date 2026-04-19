@@ -110,7 +110,7 @@ export class MakeDoc extends Component {
 
               <Form
                 onReset={event => console.log(event)}
-                onSubmit={({ value }) => {
+                onSubmit={({ value }:{value:{ firstName: string, lastName: string, email: string, password: string, gender: string, schedule: string }}) => {
                   fetch(`http://localhost:3001/checkIfDocExists?email=${value.email}`)
                     .then(res => res.json())
                     .then(res => {

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, type MenuHTMLAttributes } from 'react';
 import {
     Box,
     Heading,
@@ -66,8 +66,14 @@ const AppBar = (props) => (
         style={{ zIndex: '10' }}
         {...props} />
 );
+type MenuButtonProps = {
+    label: string;
+    icon: React.ReactElement;
+    href?: string;
+    onClick?: () => void;
+};
 
-const MenuButton = ({ label, icon, href, onClick }) => (
+const MenuButton = ({ label, icon, href, onClick }:MenuButtonProps) => (
     <Button 
         hoverIndicator={{ color: "#333333" }} 
         plain 
