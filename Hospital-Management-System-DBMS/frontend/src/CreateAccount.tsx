@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component, type ComponentPropsWithoutRef } from 'react';
 import {
   Box,
   Button,
@@ -9,13 +9,30 @@ import {
   Text,
   Select,
   TextInput,
-  Main
+  Main,
+  type ThemeType,
 } from 'grommet';
 
 import './App.css';
 
+interface CreateAccountFormValues {
+  name: string;
+  gender: string;
+  age: string;
+  height: string;
+  weight: string;
+  conditions?: string;
+  surgeries?: string;
+  medications?: string;
+  address: string;
+  email: string;
+  password: string;
+}
+
+type AppBarProps = ComponentPropsWithoutRef<typeof Box>;
+
 // 1. 統一工業風主題配置
-const theme = {
+const theme: ThemeType = {
   global: {
     colors: {
       brand: '#000000',
@@ -45,8 +62,7 @@ const theme = {
       size: 'xsmall' 
     },
     margin: { bottom: 'small' },
-    round: '0px',
-    container: { flex: false }
+    round: '0px'
   },
   select: {
     control: { extend: 'border-radius: 0px;' },
@@ -54,7 +70,7 @@ const theme = {
   }
 };
 
-const AppBar = (props) => (
+const AppBar = (props: AppBarProps) => (
   <Box
     tag='header'
     direction='row'
@@ -70,6 +86,33 @@ const AppBar = (props) => (
 
 export class CreateAccount extends Component {
   render() {
+    const handleSubmit = ({ value }: { value: CreateAccountFormValues }) => {
+      const formValue = value as CreateAccountFormValues;
+
+      fetch(`http://localhost:3001/checkIfPatientExists?email=${encodeURIComponent(formValue.email)}`)
+        .then(res => res.json())
+        .then(res => {
+          if (res.data[0]) {
+            window.alert('該郵箱已關聯現有賬戶 / EMAIL ALREADY EXISTS.');
+          } else {
+            fetch(
+              `http://localhost:3001/makeAccount?name=${encodeURIComponent(formValue.name)}` +
+              `&email=${encodeURIComponent(formValue.email)}` +
+              `&password=${encodeURIComponent(formValue.password)}` +
+              `&address=${encodeURIComponent(formValue.address)}` +
+              `&gender=${encodeURIComponent(formValue.gender)}` +
+              `&age=${encodeURIComponent(formValue.age)}` +
+              `&height=${encodeURIComponent(formValue.height)}` +
+              `&weight=${encodeURIComponent(formValue.weight)}` +
+              `&conditions=${encodeURIComponent(formValue.conditions ?? '')}` +
+              `&medications=${encodeURIComponent(formValue.medications ?? '')}` +
+              `&surgeries=${encodeURIComponent(formValue.surgeries ?? '')}`
+            )
+              .then(() => { window.location.href = '/Home'; });
+          }
+        });
+    };
+
     return (
       <Grommet theme={theme} full>
         <Box fill background="#fafafa" overflow="auto">
@@ -103,30 +146,7 @@ export class CreateAccount extends Component {
                 <Text size="small" weight="bold">病人註冊表單 / PATIENT ENROLLMENT FORM</Text>
               </Box>
 
-              <Form
-                onSubmit={({ value }) => {
-                  fetch("http://localhost:3001/checkIfPatientExists?email=" + value.email)
-                    .then(res => res.json())
-                    .then(res => {
-                      if (res.data[0]) {
-                        window.alert("該郵箱已關聯現有賬戶 / EMAIL ALREADY EXISTS.");
-                      } else {
-                        fetch("http://localhost:3001/makeAccount?name=" + value.name + 
-                              "&email=" + value.email + 
-                              "&password=" + value.password + 
-                              "&address=" + value.address + 
-                              "&gender=" + value.gender + 
-                              "&age=" + value.age + 
-                              "&height=" + value.height + 
-                              "&weight=" + value.weight + 
-                              "&conditions=" + value.conditions + 
-                              "&medications=" + value.medications + 
-                              "&surgeries=" + value.surgeries)
-                        .then(() => { window.location = "/Home"; });
-                      }
-                    });
-                }}
-              >
+              <Form onSubmit={handleSubmit}>
                 {/* 基礎資料分組 */}
                 <Box direction="row-responsive" gap="medium" flex={false}>
                   <Box flex fill="horizontal">

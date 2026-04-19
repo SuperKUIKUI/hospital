@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, type ComponentPropsWithoutRef, type ReactElement } from 'react';
 import {
     Box,
     Heading,
@@ -8,7 +8,8 @@ import {
     CardBody,
     CardFooter,
     Text,
-    Collapsible
+    Collapsible,
+    type ThemeType,
 } from 'grommet';
 import {
     Calendar,
@@ -26,7 +27,16 @@ import femaleIcon from './female.png';
 
 import './App.css';
 
-const theme = {
+type AppBarProps = ComponentPropsWithoutRef<typeof Box>;
+
+interface MenuButtonProps {
+    label: string;
+    icon: ReactElement<{ color?: string; size?: string }>;
+    href?: string;
+    onClick?: () => void;
+}
+
+const theme: ThemeType = {
     global: {
         colors: {
             brand: '#000000',
@@ -55,7 +65,7 @@ const theme = {
     }
 };
 
-const AppBar = (props) => (
+const AppBar = (props: AppBarProps) => (
     <Box
         tag='header'
         direction='row'
@@ -67,7 +77,7 @@ const AppBar = (props) => (
         {...props} />
 );
 
-const MenuButton = ({ label, icon, href, onClick }) => (
+const MenuButton = ({ label, icon, href, onClick }: MenuButtonProps) => (
     <Button 
         hoverIndicator={{ color: "#333333" }} 
         plain 
@@ -133,7 +143,7 @@ export class DocHome extends Component {
             const isMale = ["male", "man", "boy", "m", "男"].includes(genderStr);
             const isFemale = ["female", "woman", "girl", "f", "女"].includes(genderStr);
             
-            const imgStyle = {
+            const imgStyle: React.CSSProperties = {
                 width: '180px', // 稍微調大一點，視覺更平衡
                 height: '180px',
                 objectFit: 'cover',
@@ -162,7 +172,12 @@ export class DocHome extends Component {
             );
         };
 
-        const InfoRow = ({ label, value }) => (
+        interface InfoRowProps {
+            label: string;
+            value?: string;
+        }
+
+        const InfoRow = ({ label, value }: InfoRowProps) => (
             <Box 
                 direction="row" 
                 align="center"

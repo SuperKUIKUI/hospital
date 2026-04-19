@@ -1,7 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent } from 'react';
 import { 
-  Grommet, Box, Button, Heading, TextArea, Layer, Card, CardBody, Text 
+  Grommet, Box, Button, Heading, TextArea, Layer, Text 
 } from 'grommet';
+
+interface DiagnoseProps {
+  match?: {
+    params?: {
+      id?: string;
+    };
+  };
+  history?: {
+    push: (path: string) => void;
+  };
+}
+
+interface Drug {
+  name: string;
+  category?: string;
+  dosage?: string;
+  stock?: number;
+  description?: string;
+}
 
 // ⚫️⚪️ 纯黑白极简主题配置
 const theme = {
@@ -46,22 +65,22 @@ const patientInfo = {
     "pregnant_weeks": 0
 };
 
-const Diagnose = (props) => {
+const Diagnose = (props: DiagnoseProps) => {
   // 获取路由参数中的预约 ID
   const id = props.match?.params?.id;
 
-  const [diagnosis, setDiagnosis] = useState("");
-  const [prescription, setPrescription] = useState("");
+  const [diagnosis, setDiagnosis] = useState<string>("");
+  const [prescription, setPrescription] = useState<string>("");
 
-  const [showDrugs, setShowDrugs] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [showDrugs, setShowDrugs] = useState<boolean>(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   
   // --- 新增：药品数据库状态 ---
-  const [dbDrugs, setDbDrugs] = useState([]); 
-  const [loadingDrugs, setLoadingDrugs] = useState(false);
+  const [dbDrugs, setDbDrugs] = useState<Drug[]>([]); 
+  const [loadingDrugs, setLoadingDrugs] = useState<boolean>(false);
 
-  const [auditLoading, setAuditLoading] = useState(false);
-  const [auditResult, setAuditResult] = useState(null);
+  const [auditLoading, setAuditLoading] = useState<boolean>(false);
+  const [auditResult, setAuditResult] = useState<string | null>(null);
 
   // ---从后端获取药品库 ---
   const fetchDrugs = () => {
@@ -88,7 +107,7 @@ const Diagnose = (props) => {
   }, []);
 
   // --- 新增：将扁平化的数据库数据按分类分组 ---
-  const groupedDrugs = dbDrugs.reduce((acc, drug) => {
+  const groupedDrugs = dbDrugs.reduce<Record<string, Drug[]>>((acc, drug) => {
     const cat = drug.category || "未分类";
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(drug);
@@ -96,7 +115,7 @@ const Diagnose = (props) => {
   }, {});
 
   // 插入药品到处方框
-  const insertDrug = (drugName) => {
+  const insertDrug = (drugName: string) => {
     const newVal = prescription + (prescription ? "\n" : "") + drugName;
     setPrescription(newVal);
   };
@@ -177,7 +196,13 @@ const Diagnose = (props) => {
           </Box>
           <Button 
             label="BACK TO LIST" 
-            onClick={() => props.history.push("/ApptList")}
+            onClick={() => {
+              if (props.history) {
+                props.history.push('/ApptList');
+              } else {
+                window.location.href = '/ApptList';
+              }
+            }}
             plain
             hoverIndicator
             style={{ fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px' }}
@@ -186,13 +211,13 @@ const Diagnose = (props) => {
 
         {/* 2. 核心诊断与处方区 - 采用更通透的布局 */}
         <Box direction="row" gap="xlarge">
-          <Box flex="1" gap="small">
+          <Box flex="grow" gap="small">
             <Text weight="bold" size="small">【  臨床診斷 / CLINICAL DIAGNOSIS 】</Text>
             <Box border={{ color: 'black', size: '1px' }} height="300px" background="light-2">
               <TextArea
                 placeholder="在此輸入診斷結果..."
                 value={diagnosis}
-                onChange={(e) => setDiagnosis(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setDiagnosis(e.target.value)}
                 fill
                 plain
                 style={{ padding: '20px', lineHeight: '1.8' }}
@@ -200,7 +225,7 @@ const Diagnose = (props) => {
             </Box>
           </Box>
 
-          <Box flex="1" gap="small">
+          <Box flex="grow" gap="small">
             <Box direction="row" justify="between" align="end">
               <Text weight="bold" size="small">【  處方方案 / PRESCRIPTION 】</Text>
               <Button 
@@ -215,7 +240,7 @@ const Diagnose = (props) => {
               <TextArea
                 placeholder="在此輸入處方內容或從藥庫選擇..."
                 value={prescription}
-                onChange={(e) => setPrescription(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setPrescription(e.target.value)}
                 fill
                 plain
                 style={{ padding: '20px', lineHeight: '1.8' }}
@@ -307,7 +332,9 @@ const Diagnose = (props) => {
 
       <Box gap="xsmall" overflow="auto" height="450px">
         {loadingDrugs ? (
-          <Text alignSelf="center" pad="large">LOADING DATABASE...</Text>
+          <Box align="center" pad="large">
+            <Text>LOADING DATABASE...</Text>
+          </Box>
         ) : !selectedCategory ? (
           /* 1. 显示分类列表 */
           Object.keys(groupedDrugs).map(cat => (
@@ -337,7 +364,7 @@ const Diagnose = (props) => {
                 <Box pad="medium" border={{ side: 'bottom', color: 'light-3' }}>
                   <Box direction="row" justify="between">
                     <Text weight="bold">{drug.name}</Text>
-                    {drug.stock <= 5 && <Text color="status-critical" size="xsmall">LOW STOCK: {drug.stock}</Text>}
+                    {drug.stock !== undefined && drug.stock <= 5 && <Text color="status-critical" size="xsmall">LOW STOCK: {drug.stock}</Text>}
                   </Box>
                   <Text size="small" color="dark-4">{drug.description || "无描述信息"}</Text>
                 </Box>
@@ -354,7 +381,7 @@ const Diagnose = (props) => {
           plain 
           style={{ visibility: selectedCategory ? 'visible' : 'hidden', fontSize: '12px', fontWeight: 'bold' }} 
         />
-        <Button label="CLOSE" onClick={() => setShowDrugs(false)} plain weight="bold" />
+        <Button label={<Text weight="bold">CLOSE</Text>} onClick={() => setShowDrugs(false)} plain />
       </Box>
     </Box>
   </Layer>

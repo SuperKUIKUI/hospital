@@ -72,7 +72,12 @@ const AnimationStyles = () => (
 // ==========================================
 
 // 統計卡片
-const StatCard = ({ title, value, subtitle }) => (
+type StatCardProps = {
+  title: string;
+  value: number | string;
+  subtitle: string;
+}
+const StatCard = ({ title, value, subtitle }:StatCardProps) => (
   <Box 
     flex={false}
     background="white" 
@@ -90,7 +95,12 @@ const StatCard = ({ title, value, subtitle }) => (
 );
 
 // 修復後的柱狀圖
-const BarChart = ({ data, labels, height = 220 }) => {
+type BarChartProps = {
+  data: number[];
+  labels: string[];
+  height?: number;
+}
+const BarChart = ({ data, labels, height = 220 }:BarChartProps) => {
   if (!data || data.length === 0) return <Box pad="medium" align="center"><Text>暫無數據</Text></Box>;
   
   const numericData = data.map(v => Number(v) || 0);

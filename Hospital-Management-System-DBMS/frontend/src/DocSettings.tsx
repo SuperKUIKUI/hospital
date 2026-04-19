@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import {
   Box,
   Button,
@@ -10,10 +10,11 @@ import {
   Text,
   TextInput,
   Main,
+  type ThemeType,
 } from 'grommet';
 import { FormPreviousLink, ShieldSecurity, MailOption } from 'grommet-icons';
 
-const theme = {
+const theme: ThemeType = {
   global: {
     colors: {
       brand: '#000000',
@@ -43,8 +44,13 @@ const theme = {
   }
 };
 
-export class DocSettings extends Component {
-  constructor(props) {
+interface DocSettingsState {
+  passwordMessage: string;
+  emailMessage: string;
+}
+
+export class DocSettings extends Component<{}, DocSettingsState> {
+  constructor(props: {}) {
     super(props);
     this.state = {
       passwordMessage: '',
@@ -52,7 +58,7 @@ export class DocSettings extends Component {
     };
   }
 
-  showMessage(type, message) {
+  showMessage(type: 'password' | 'email', message: string) {
     if (type === 'password') {
       this.setState({ passwordMessage: message });
       setTimeout(() => this.setState({ passwordMessage: '' }), 3000);
@@ -116,7 +122,7 @@ export class DocSettings extends Component {
                   </Box>
                   
                   <Form
-                    onSubmit={({ value }) => {
+                    onSubmit={({ value }: { value: Record<string, string> }) => {
                       fetch('http://localhost:3001/userInSession')
                         .then(res => res.json())
                         .then(res => {
@@ -170,7 +176,7 @@ export class DocSettings extends Component {
                   </Box>
 
                   <Form
-                    onSubmit={({ value }) => {
+                    onSubmit={({ value }:{value:{newEmail:string,password:string }}) => {
                       fetch('http://localhost:3001/userInSession')
                         .then(res => res.json())
                         .then(res => {
