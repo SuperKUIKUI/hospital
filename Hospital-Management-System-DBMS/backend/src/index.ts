@@ -510,6 +510,56 @@ app.get("/patientViewAppt", async (c) => {
     }
 });
 
+app.get("/getDateTimeOfAppt", async (c) => {
+    const id = c.req.query("id") as string;
+    const sql = `SELECT starttime as start, endtime as end, date as theDate FROM Appointment WHERE id = ?`;
+    try {
+        const [results] = await pool.execute(sql, [id]);
+        return c.json({ data: results });
+    } catch (error) {
+        return c.json({ error: "Database error" }, 500);
+    }
+});
+
+app.get("/OneHistory", async (c) => {
+    const patientEmail = c.req.query("patientEmail") as string;
+    const sql = `SELECT gender, name, email, address, conditions, surgeries, medication
+                 FROM PatientsFillHistory
+                 JOIN Patient ON PatientsFillHistory.patient = Patient.email
+                 JOIN MedicalHistory ON PatientsFillHistory.history = MedicalHistory.id
+                 WHERE Patient.email = ?`;
+    try {
+        const [results] = await pool.execute(sql, [patientEmail]);
+        return c.json({ data: results });
+    } catch (error) {
+        return c.json({ error: "Database error" }, 500);
+    }
+});
+
+app.get("/checkIfHistory", async (c) => {
+    const email = c.req.query("email") as string;
+    const sql = `SELECT patient FROM PatientsFillHistory WHERE patient = ?`;
+    try {
+        const [results] = await pool.execute(sql, [email]);
+        return c.json({ data: results });
+    } catch (error) {
+        return c.json({ error: "Database error" }, 500);
+    }
+});
+
+app.get("/addToPatientSeeAppt", async (c) => {
+    const { email, id: apptId, concerns, symptoms } = c.req.query();
+    const sql = `INSERT INTO PatientsAttendAppointments (patient, appt, concerns, symptoms)
+                 VALUES (?, ?, ?, ?)`;
+    try {
+        const [results] = await pool.execute(sql, [email, apptId, concerns, symptoms]);
+        return c.json({ data: results });
+    } catch (error) {
+        console.error(error);
+        return c.json({ error: "Database error" }, 500);
+    }
+});
+
 app.get("/doctorViewAppt", async (c) => {
     const sql = `SELECT a.id, a.date, a.starttime, a.status, p.name, psa.concerns, psa.symptoms
                  FROM Appointment a, PatientsAttendAppointments psa, Patient p
@@ -517,6 +567,22 @@ app.get("/doctorViewAppt", async (c) => {
                  AND a.id IN (SELECT appt FROM Diagnose WHERE doctor=?)`;
     try {
         const [results] = await pool.execute(sql, [email_in_use]);
+        return c.json({ data: results });
+    } catch (error) {
+        return c.json({ error: "Database error" }, 500);
+    }
+});
+
+app.get("/allDiagnoses", async (c) => {
+    const email = c.req.query("patientEmail") as string;
+    const sql = `SELECT A.date, D.name AS doctor, psa.concerns, psa.symptoms, d.diagnosis, d.prescription
+                 FROM Appointment A
+                 INNER JOIN PatientsAttendAppointments psa ON A.id = psa.appt
+                 INNER JOIN Diagnose d ON psa.appt = d.appt
+                 INNER JOIN Doctor D ON d.doctor = D.email
+                 WHERE psa.patient = ?`;
+    try {
+        const [results] = await pool.execute(sql, [email]);
         return c.json({ data: results });
     } catch (error) {
         return c.json({ error: "Database error" }, 500);
@@ -596,8 +662,8 @@ const server = {
     fetch: app.fetch,
 };
 
-// serve(server, (info) => {
-//     console.log(`Listening on http://localhost:${info.port}`);
-// });
+serve(server, (info) => {
+    console.log(`Listening on http://localhost:${info.port}`);
+});
 
 export default server;

@@ -14,3 +14,4 @@ yarn-error.log*
 .npm/
 yarn.lock
 Data_Design
+backend/dist
