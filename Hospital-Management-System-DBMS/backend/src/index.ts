@@ -3,10 +3,19 @@ import { serve } from "@hono/node-server";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { serveStatic } from "@hono/node-server/serve-static";
-import mysql from "mysql2/promise";
+import mysql, { createPool } from "mysql2/promise";
+import { createPool as createPool2 } from "mysql2";
 import path from "path";
+import { Kysely, MysqlDialect } from "kysely";
+import { env } from "process";
+import { DB } from "./db/generated";
+import { HonoEnv } from "./types";
+import { config as dotconfig } from "dotenv";
+import { auth } from "./auth";
 
-const app = new Hono();
+
+const app = new Hono<HonoEnv>();
+dotconfig();
 
 // 数据库连接配置
 const dbConfig: mysql.PoolOptions = {
@@ -29,6 +38,29 @@ let who = "";
 // 中间件
 app.use("*", logger());
 app.use("*", cors());
+
+app.use('*', async (c, next) => {
+  c.env = {
+    ...c.env,
+    ...process.env
+  }
+  await next()
+})
+
+
+const dbInstance = new Kysely<DB>({
+    dialect: new MysqlDialect({
+        pool: createPool2(process.env.DATABASE_URL as string),
+    }),
+});
+
+app.use("*", async (c, next) => {
+    c.set("db", dbInstance);
+    await next();
+});
+
+app.route("/", auth);
+
 
 app.get("/", (c) => {
     return c.text("Hospital Management System Backend (Hono)");
@@ -656,14 +688,19 @@ app.onError((err, c) => {
     return c.json({ error: "Internal Server Error" }, 500);
 });
 
-// --- 启动服务器 ---
-const server = {
-    port: 3001,
-    fetch: app.fetch,
-};
+if (process.env.NODE_ENV === "production") {
+    serve(
+        {
+            fetch: app.fetch,
+            port: 3001,
+        },
+        (info) => {
+            console.log(
+                `[Production] Listening on http://localhost:${info.port}`,
+            );
+        },
+    );
+}
 
-serve(server, (info) => {
-    console.log(`Listening on http://localhost:${info.port}`);
-});
+export default app;
 
-export default server;

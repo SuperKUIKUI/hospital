@@ -18,6 +18,8 @@
 ## API 概览
 
 ### 1. 认证与会话管理 (Authentication & Session)
+- TODO : 迁移到 auth.ts 
+
 | 接口 | 方法 | 说明 | 参数 (Query) |
 | :--- | :--- | :--- | :--- |
 | `/checklogin` | `GET` | 患者登录 | `email, password` |
