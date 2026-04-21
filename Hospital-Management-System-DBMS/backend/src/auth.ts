@@ -71,6 +71,9 @@ auth.post("/login", async (c) => {
             }, c.env.ES256_PRIKEY, "ES256"),
             {
                 httpOnly: true,
+                sameSite: "none",
+                secure: true,
+                path: "/",
             },
         );
         return c.json({ ok: "ok" });

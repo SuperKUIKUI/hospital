@@ -11,6 +11,7 @@ import {
   TextInput,
   Text,
 } from 'grommet';
+import { UserService } from "./api/services/user";
 
 import './App.css';
 
@@ -121,16 +122,24 @@ const LogIn = () => {
                 const endpoint = isDoctor ? "checkDoclogin" : "checklogin";
                 const redirect = isDoctor ? "/DocHome" : "/Home";
                 
-                fetch(`http://localhost:3001/${endpoint}?email=${value.email}&password=${value.password}`)
-                  .then(res => res.json())
-                  .then(res => {
-                    if (!res.data || res.data.length === 0) {
-                      window.alert("登錄信息有誤 / INVALID CREDENTIALS");
-                    } else {
-                      // 3. 使用 navigate 替代 window.location，体验更流畅
-                      navigate(redirect);
-                    }
-                  });
+                // fetch(`http://localhost:3001/${endpoint}?email=${value.email}&password=${value.password}`)
+                //   .then(res => res.json())
+                //   .then(res => {
+                //     if (!res.data || res.data.length === 0) {
+                //       window.alert("登錄信息有誤 / INVALID CREDENTIALS");
+                //     } else {
+                //       // 3. 使用 navigate 替代 window.location，体验更流畅
+                //       navigate(redirect);
+                //     }
+                //   });
+                UserService.login(value.email, value.password)
+                    .then(() => {
+                        console.log("Succesfully login!");
+                        // navigate(redirect);
+                    })
+                    .catch(() => {
+                        window.alert("登錄信息有誤 / INVALID CREDENTIALS");
+                    });
               }}
             >
               <Box flex={false} gap="small">

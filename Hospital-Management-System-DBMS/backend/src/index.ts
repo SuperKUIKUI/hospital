@@ -36,8 +36,15 @@ let password_in_use = "";
 let who = "";
 
 // 中间件
+app.use("*",
+    cors({
+        origin: "http://localhost:3000",
+        allowMethods: ["GET", "POST", "OPTIONS"],
+        allowHeaders: ["Content-Type", "Cookie"],
+        credentials: true,
+    }),
+);
 app.use("*", logger());
-app.use("*", cors());
 
 app.use('*', async (c, next) => {
   c.env = {

@@ -8,6 +8,10 @@ export default defineConfig({
         }),
     ],
     server: {
+        cors: {
+            origin: "http://localhost:3000",
+            credentials: true,
+        },
         port: 3001,
     },
     build: {
@@ -18,7 +22,7 @@ export default defineConfig({
                 format: "esm", // This tells Vite: "Use ES Modules format for the bundled file!"
                 entryFileNames: "index.js", // This tells Vite: "Name the bundled file 'index.js'!"
                 codeSplitting: true, // This tells Vite: "If there are multiple entry points, split the code into separate files!"
-                minify: true, // This tells Vite: "Minify the bundled code to reduce file size!"
+                // minify: true, // This tells Vite: "Minify the bundled code to reduce file size!"
             },
         },
         target: "node22", // This tells Vite: "The bundled code should be compatible with Node.js version 22!"
