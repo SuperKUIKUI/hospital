@@ -10,60 +10,61 @@ import {
   CheckBox,
   TextInput,
   Text,
+  type ThemeType,
 } from 'grommet';
 import { UserService } from "./api/services/user";
 
 import './App.css';
 
 // ... theme 配置保持不变 ...
-const theme = {
-  global: {
-    colors: {
-      brand: '#000000',
-      background: '#ffffff',
-      focus: 'transparent',
-      text: '#000000',
-      control: '#000000',
-    },
-    font: {
-      family: '"Lato", "Helvetica Neue", "Microsoft JhengHei", sans-serif',
-      size: '15px',
-    },
-    input: {
-      weight: 700,
-      extend: `
+const theme: ThemeType = {
+    global: {
+        colors: {
+            brand: "#000000",
+            background: "#ffffff",
+            focus: "transparent",
+            text: "#000000",
+            control: "#000000",
+        },
+        font: {
+            family: '"Lato", "Helvetica Neue", "Microsoft JhengHei", sans-serif',
+            size: "15px",
+        },
+        input: {
+            weight: 700,
+            extend: `
         padding: 12px;
         background: #ffffff;
-      `
-    }
-  },
-  button: {
-    border: { radius: '0px', width: '2px' },
-    primary: { color: '#ffffff', background: '#000000' },
-    extend: `
+      `,
+        },
+    },
+    button: {
+        border: { radius: "0px", width: "2px" },
+        primary: { color: "#ffffff", background: "#000000" },
+        extend: `
       font-weight: bold;
       letter-spacing: 1px;
-    `
-  },
-  formField: {
-    border: { side: 'all', color: 'black', size: '2px' },
-    label: { 
-        margin: { bottom: 'xsmall', left: 'xsmall', top: 'small' }, 
-        weight: 'bold', 
-        size: 'small' 
+    `,
     },
-    margin: { bottom: 'medium' },
-    round: '0px',
-  },
-  checkBox: {
-    border: { color: 'black', width: '2px' },
-    check: { thickness: '4px' },
-    size: '20px',
-    gap: 'small'
-  }
+    formField: {
+        border: { side: "all", color: "black", size: "2px" },
+        label: {
+            margin: { bottom: "xsmall", left: "xsmall", top: "small" },
+            weight: "bold",
+            size: "small",
+        },
+        margin: { bottom: "medium" },
+        round: "0px",
+    },
+    checkBox: {
+        border: { color: "black", width: "2px" },
+        check: { thickness: "4px" },
+        size: "20px",
+        gap: "small",
+    },
 };
 
-const AppBar = (props) => (
+const AppBar = (props:any) => (
   <Box
     tag='header'
     direction='row'
@@ -119,23 +120,12 @@ const LogIn = () => {
 
             <Form
               onSubmit={({ value }:{ value: { email: string, password: string } }) => {
-                const endpoint = isDoctor ? "checkDoclogin" : "checklogin";
                 const redirect = isDoctor ? "/DocHome" : "/Home";
                 
-                // fetch(`http://localhost:3001/${endpoint}?email=${value.email}&password=${value.password}`)
-                //   .then(res => res.json())
-                //   .then(res => {
-                //     if (!res.data || res.data.length === 0) {
-                //       window.alert("登錄信息有誤 / INVALID CREDENTIALS");
-                //     } else {
-                //       // 3. 使用 navigate 替代 window.location，体验更流畅
-                //       navigate(redirect);
-                //     }
-                //   });
                 UserService.login(value.email, value.password)
                     .then(() => {
                         console.log("Succesfully login!");
-                        // navigate(redirect);
+                        navigate(redirect);
                     })
                     .catch(() => {
                         window.alert("登錄信息有誤 / INVALID CREDENTIALS");
@@ -172,16 +162,16 @@ const LogIn = () => {
 
               <Box direction="row-responsive" gap="medium" margin={{ top: 'large' }} flex={false}>
                 <Button 
+                  fill="horizontal"
                   type="submit" 
                   label="SIGN IN / 登錄系統" 
                   primary 
-                  flex 
                   style={{ padding: '16px' }}
                 />
                 <Button 
                   label="REGISTER / 註冊" 
+                  fill="horizontal"
                   onClick={() => navigate('/createAcc')} // 使用 navigate 跳转
-                  flex 
                   style={{ padding: '16px' }}
                 />
               </Box>

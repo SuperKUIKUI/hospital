@@ -8,14 +8,15 @@ import {
   CardHeader,
   Text,
   Button,
-  ResponsiveContext
+  ResponsiveContext,
+  type ThemeType
 } from "grommet";
 import { FormPreviousLink } from 'grommet-icons';
 
 // ==========================================
 // 1. 全域工業風黑白主題
 // ==========================================
-const theme = {
+const theme: ThemeType = {
   global: {
     colors: {
       brand: '#000000',
