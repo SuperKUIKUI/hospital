@@ -8,7 +8,7 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.response.use(
-  (response) => response.data, // 统一脱壳
+  (response) => response, 
   (error) => {
     // 统一错误处理，例如调用 antd 的 message.error
     return Promise.reject(error);

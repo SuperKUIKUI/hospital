@@ -23,27 +23,27 @@ import MakeDoc from './MakeDoc.tsx';
 import Diagnose from './Diagnose.tsx';
 import ShowDiagnoses from './ShowDiagnoses.tsx';
 import DocStatistics from "./DocStatistics";
+import { UserService } from "./api/services/user.ts";
 
 export default function App() {
   let [component, setComponent] = useState(<LogIn />)
 
   useEffect(() => {
-    fetch("http://localhost:3001/userInSession")
-      .then(res => res.json())
-      .then(res => {
-        // 简化解析逻辑
-        const { email, who } = res; 
-        if (email === "") {
-          setComponent(<LogIn />)
-        } else {
-          if (who === "pat") {
-            setComponent(<Home />)
-          } else {
-            setComponent(<DocHome />)
-          }
-        }
-      })
-      .catch(err => console.error("Session fetch error:", err));
+    UserService.verify()
+        .then((role) => {
+            console.log("role:", role);
+            if (role === 0) {
+                setComponent(<Home />);
+            } else if (role === 1) {
+                setComponent(<DocHome />);
+            } else {
+                setComponent(<LogIn />);
+            }
+        })
+        .catch((err) => {
+            console.error("Session fetch error:", err);
+            setComponent(<LogIn />);
+        });
   }, [])
 
   return (

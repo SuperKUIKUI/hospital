@@ -1,5 +1,6 @@
 import { Kysely } from "kysely";
 import { DB } from "./db/generated"; // 你的 Kysely 数据库定义
+import { JWTPayload } from "hono/utils/jwt/types";
 
 // --- 1. Bindings: 环境变量与外部服务 ---
 export interface Bindings {
@@ -12,11 +13,15 @@ export interface Bindings {
 // --- 2. Variables: 请求生命周期内的中间件变量 ---
 export interface Variables {
     // JWT 状态
-    jwtPayload: {
-        sub: number; // 用户ID
-        email: string;
-        role: number;
-    } | null;
+    jwtPayload:
+        | ({
+              user: {
+                  id: number; // 用户ID
+                  email: string;
+                  role: number;
+              };
+          } & JWTPayload)
+        | null;
 
     authStatus: "valid" | "invalid" | "missing";
     authError?: string;

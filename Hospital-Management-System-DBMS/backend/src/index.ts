@@ -11,7 +11,7 @@ import { env } from "process";
 import { DB } from "./db/generated";
 import { HonoEnv } from "./types";
 import { config as dotconfig } from "dotenv";
-import { auth } from "./auth";
+import { auth, customAuth } from "./auth";
 
 
 const app = new Hono<HonoEnv>();
@@ -66,12 +66,16 @@ app.use("*", async (c, next) => {
     await next();
 });
 
-app.route("/", auth);
+app.use("*", customAuth);
 
 
 app.get("/", (c) => {
     return c.text("Hospital Management System Backend (Hono)");
 });
+
+
+app.route("/", auth);
+
 
 // --- 患者相关查询 ---
 

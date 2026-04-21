@@ -33,6 +33,7 @@ const customAuth = createMiddleware<HonoEnv>(async (c, next) => {
         c.set("authStatus", "invalid");
         c.set("jwtPayload", null);
         c.set("authError", err.message);
+        console.error(err);
     }
 
     await next();
@@ -70,13 +71,25 @@ auth.post("/login", async (c) => {
               iat: Math.floor(Date.now() / 1000),
             }, c.env.ES256_PRIKEY, "ES256"),
             {
-                httpOnly: true,
+                httpOnly: false,
                 sameSite: "none",
                 secure: true,
                 path: "/",
             },
         );
         return c.json({ ok: "ok" });
+    }
+});
+auth.post("/verify", async (c) => {
+    if (c.get("authStatus") === "valid") {
+        return c.json({ ok: "ok", role: c.get("jwtPayload")?.user.role });
+    } else if (c.get("authStatus") === "missing") {
+        return c.json({ ok: "ok", role: -1 });
+    } else {
+        return c.json(
+            { error: "Unauthorized", status: c.get("authStatus") },
+            401,
+        );
     }
 });
 
