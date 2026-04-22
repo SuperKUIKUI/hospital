@@ -9,13 +9,14 @@ import {
   Text,
   TextInput,
   Select,
-  Main
+  Main,
+  type ThemeType
 } from 'grommet';
 
 import './App.css';
 
 // 1. 統一工業風主題配置 (與登錄、註冊頁面一致)
-const theme = {
+const theme:ThemeType = {
   global: {
     colors: {
       brand: '#000000',
@@ -54,7 +55,7 @@ const theme = {
   }
 };
 
-const AppBar = (props) => (
+const AppBar = (props:any) => (
   <Box
     tag='header'
     direction='row'
@@ -69,7 +70,7 @@ const AppBar = (props) => (
 );
 
 export class MakeDoc extends Component {
-  constructor(props) {
+  constructor(props:any) {
     super(props);
     this.state = {};
   }

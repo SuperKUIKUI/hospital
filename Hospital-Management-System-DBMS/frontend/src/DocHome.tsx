@@ -226,7 +226,6 @@ export class DocHome extends Component {
                                     <MenuButton label="個人帳戶設定" icon={<SettingsOption />} href="/DocSettings" />
                                     <Box border={{ side: 'top', color: 'rgba(255,255,255,0.1)' }} margin={{ top: 'medium' }} pad={{ top: 'small' }}>
                                         <MenuButton label="登出系統" icon={<Logout />} onClick={() => {
-                                            // fetch('http://localhost:3001/endSession');
                                             cookieStore.delete('auth_token');
                                             window.location.href = "/";
                                         }} />

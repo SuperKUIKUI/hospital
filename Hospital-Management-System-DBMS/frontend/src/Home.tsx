@@ -25,6 +25,7 @@ import maleIcon from './male.png';
 import femaleIcon from './female.png';
 
 import './App.css';
+import { UserService } from './api/services/user';
 
 const theme = {
     global: {
@@ -55,7 +56,7 @@ const theme = {
     }
 };
 
-const AppBar = (props) => (
+const AppBar = (props:any) => (
     <Box
         tag='header'
         direction='row'
@@ -88,7 +89,7 @@ const MenuButton = ({ label, icon, href, onClick }:MenuButtonProps) => (
 );
 
 export class Home extends Component {
-    
+
     state = { 
         patientInfo: {
             name: "載入中...",
@@ -102,33 +103,28 @@ export class Home extends Component {
         showSidebar: true 
     }
 
-    componentDidMount() {
-        fetch("http://localhost:3001/userInSession")
-            .then(res => res.json())
-            .then(res => {
-                var email_json = JSON.parse(JSON.stringify(res));
-                let email_in_use = email_json.email;
-                
-                fetch('http://localhost:3001/checkIfPatientExists?email=' + email_in_use)
-                    .then(res => res.json())
-                    .then(res => {
-                        if (res.data && res.data.length > 0) {
-                            this.setState({ patientInfo: res.data[0] });
-                        } else {
-                            this.setState({ 
-                                patientInfo: { 
-                                    name: "未找到用戶", 
-                                    email: email_in_use,
-                                    gender: "未知", 
-                                    address: "未知",
-                                    age: "未知",
-                                    height: "未知",
-                                    weight: "未知"
-                                } 
-                            });
-                        }
-                    })
-                    .catch(err => console.error("Fetch error:", err));
+    componentDidMount() {        
+        UserService.role_patient()
+            .then((pat) => {
+                if (pat) {
+                    this.setState({ patientInfo: pat });
+                } else {
+                    this.setState({
+                        patientInfo: {
+                            name: "未找到用戶",
+                            email: "undefined",
+                            gender: "未知",
+                            address: "未知",
+                            age: "未知",
+                            height: "未知",
+                            weight: "未知",
+                        },
+                    });
+                }
+            })
+            .catch((err) => {
+                console.error("Fetch error:", err);
+                window.location.href = '/'
             });
     }
 
@@ -228,8 +224,8 @@ export class Home extends Component {
                                     <MenuButton label="個人帳號設定" icon={<SettingsOption />} href="/Settings" />
                                     <Box border={{ side: 'top', color: 'rgba(255,255,255,0.1)' }} margin={{ top: 'medium' }} pad={{ top: 'small' }}>
                                         <MenuButton label="登出系統" icon={<Logout />} onClick={() => {
-                                                fetch('http://localhost:3001/endSession');
-                                                window.location.href = "/";
+                                            cookieStore.delete('auth_token');
+                                            window.location.href = "/";
                                             }}
                                         />
                                     </Box>

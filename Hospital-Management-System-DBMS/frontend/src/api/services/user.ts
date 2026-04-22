@@ -1,5 +1,6 @@
 // src/api/services/user.ts
 import apiClient from "../client";
+import type { PatientInfo } from "../types/user";
 
 export const UserService = {
     login: async (email: string, password: string): Promise<void> => {
@@ -9,4 +10,8 @@ export const UserService = {
         const data = (await apiClient.post('/verify')).data;
         return data.role;
     },
+    role_patient: async(): Promise<PatientInfo>=>{
+        const req = await apiClient.get("/role");
+        return req.data;
+    }
 };

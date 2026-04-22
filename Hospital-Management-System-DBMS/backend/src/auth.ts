@@ -5,6 +5,7 @@ import { decode, jwt, sign, verify } from "hono/jwt";
 import { Users } from "./db/generated";
 import { HonoEnv } from "./types";
 import { sha256 } from "hono/utils/crypto";
+import { UserService } from "./services/user"
 
 const auth = new Hono<HonoEnv>();
 
@@ -80,6 +81,21 @@ auth.post("/login", async (c) => {
         return c.json({ ok: "ok" });
     }
 });
+
+interface CreateAccountFormValues {
+  name: string;
+  gender: string;
+  age: number;
+  height: string;
+  weight: string;
+  conditions?: string;
+  surgeries?: string;
+  medications?: string;
+  address: string;
+  email: string;
+  password: string;
+}
+
 auth.post("/verify", async (c) => {
     if (c.get("authStatus") === "valid") {
         return c.json({ ok: "ok", role: c.get("jwtPayload")?.user.role });
@@ -90,6 +106,53 @@ auth.post("/verify", async (c) => {
             { error: "Unauthorized", status: c.get("authStatus") },
             401,
         );
+    }
+});
+auth.post("/register", async (c) => {
+    try {
+        const data = (await c.req.json()) as CreateAccountFormValues;
+        const db = c.get("db");
+        const password = (await sha256(data.password)) as string;
+
+        const exists = await UserService.findUserByEmail(db, data.email);
+        if (exists.length > 0) {
+            return c.json({ error: "User already exists" }, 400);
+        }
+
+        await UserService.registerUserAsPatient(db, data.email, password, data);
+        return c.json({ ok: "ok" });
+    } catch (err: any) {
+        if (err instanceof SyntaxError) {
+            console.error(err);
+            return c.json({ error: "Invalid JSON format" }, 400);
+        } else {
+            console.error(err);
+            return c.json({ error: err.message }, 500);
+        }
+    }
+});
+auth.get("/role", async (c) => {
+    try {
+        const db = c.get("db");
+        if (c.get("authStatus") === "valid") {
+            const data = c.get('jwtPayload')?.user
+            const role = data?.role
+            const email = data?.email || "";
+            switch (role) {
+                case 0:
+                    const pat = await UserService.selectPatient(db, email);
+                    return c.json(pat[0]);
+                    break;
+            
+                default:
+                    break;
+            }
+        } else {
+            throw new Error("Invalid token!");
+        }
+        return c.json({});
+    } catch (err: any) {
+        return c.json({ error: err.message }, 500);
     }
 });
 

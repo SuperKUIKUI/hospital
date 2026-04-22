@@ -255,50 +255,7 @@ app.get("/doctorStatistics", async (c) => {
     }
 });
 
-// --- 登录与会话 ---
 
-app.get("/checklogin", async (c) => {
-    const { email, password } = c.req.query();
-    const sql = `SELECT * FROM Patient WHERE email=? AND password=?`;
-    try {
-        const [results]: any = await pool.execute(sql, [email, password]);
-        if (results.length > 0) {
-            email_in_use = email;
-            password_in_use = password;
-            who = "pat";
-        }
-        return c.json({ data: results });
-    } catch (error) {
-        return c.json({ failed: "error occurred" }, 500);
-    }
-});
-
-app.get("/checkDoclogin", async (c) => {
-    const { email, password } = c.req.query();
-    const sql = `SELECT * FROM Doctor WHERE email=? AND password=?`;
-    try {
-        const [results]: any = await pool.execute(sql, [email, password]);
-        if (results.length > 0) {
-            email_in_use = results[0].email;
-            password_in_use = results[0].password;
-            who = "doc";
-        }
-        return c.json({ data: results });
-    } catch (error) {
-        return c.json({ failed: "error occurred" }, 500);
-    }
-});
-
-app.get("/userInSession", (c) => {
-    return c.json({ email: email_in_use, who: who });
-});
-
-app.get("/endSession", (c) => {
-    email_in_use = "";
-    password_in_use = "";
-    who = "";
-    return c.json({ success: true });
-});
 
 // --- 密码与邮箱重置 (POST) ---
 
