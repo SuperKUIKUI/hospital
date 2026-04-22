@@ -30,6 +30,8 @@ export interface DocsHaveSchedules {
 }
 
 export interface Doctor {
+  address: Generated<string | null>;
+  age: Generated<number | null>;
   email: string;
   gender: string;
   name: string;
@@ -60,11 +62,14 @@ export interface Medications {
 export interface Patient {
   address: string;
   age: Generated<number | null>;
+  conditions: Generated<string | null>;
   email: string;
   gender: string;
   height: Generated<string | null>;
+  medications: Generated<string | null>;
   name: string;
-  password: string;
+  password: Generated<string | null>;
+  surgeries: Generated<string | null>;
   weight: Generated<string | null>;
 }
 

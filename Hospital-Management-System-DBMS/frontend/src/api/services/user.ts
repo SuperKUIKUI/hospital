@@ -1,17 +1,21 @@
 // src/api/services/user.ts
 import apiClient from "../client";
-import type { PatientInfo } from "../types/user";
+import type { DoctorInfo, PatientInfo } from "../types/user";
 
 export const UserService = {
     login: async (email: string, password: string): Promise<void> => {
         return apiClient.post("/login", { email, password });
     },
     verify: async (): Promise<number> => {
-        const data = (await apiClient.post('/verify')).data;
+        const data = (await apiClient.post("/verify")).data;
         return data.role;
     },
-    role_patient: async(): Promise<PatientInfo>=>{
+    role_patient: async (): Promise<PatientInfo> => {
         const req = await apiClient.get("/role");
         return req.data;
-    }
+    },
+    role_doctor: async (): Promise<DoctorInfo> => {
+        const req = await apiClient.get("/role");
+        return req.data;
+    },
 };

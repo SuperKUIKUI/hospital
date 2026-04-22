@@ -21,3 +21,12 @@ export interface PatientInfo {
     name: string;
     weight: string | null;
 }
+
+export interface DoctorInfo {
+    address?: string;
+    age?: number;
+    email: string;
+    gender: string;
+    name: string;
+    password: string;
+}

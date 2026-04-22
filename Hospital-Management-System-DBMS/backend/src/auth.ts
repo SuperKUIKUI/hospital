@@ -143,7 +143,10 @@ auth.get("/role", async (c) => {
                     const pat = await UserService.selectPatient(db, email);
                     return c.json(pat[0]);
                     break;
-            
+                case 1:
+                    const doc = await UserService.selectDoctor(db,email);
+                    return c.json(doc[0]);
+                    break;
                 default:
                     break;
             }

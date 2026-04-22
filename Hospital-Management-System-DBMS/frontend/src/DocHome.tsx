@@ -26,6 +26,7 @@ import maleIcon from './male.png';
 import femaleIcon from './female.png';
 
 import './App.css';
+import { UserService } from './api/services/user';
 
 type AppBarProps = ComponentPropsWithoutRef<typeof Box>;
 
@@ -105,30 +106,25 @@ export class DocHome extends Component {
     }
 
     componentDidMount() {
-        fetch("http://localhost:3001/userInSession")
-            .then(res => res.json())
-            .then(res => {
-                const email_json = JSON.parse(JSON.stringify(res));
-                let email_in_use = email_json.email;
-
-                fetch('http://localhost:3001/checkIfDocExists?email=' + email_in_use)
-                    .then(res => res.json())
-                    .then(res => {
-                        if (res.data && res.data.length > 0) {
-                            this.setState({ doctorInfo: res.data[0] });
-                        } else {
-                            this.setState({
-                                doctorInfo: {
-                                    name: "未找到資料",
-                                    email: email_in_use,
-                                    gender: "未知",
-                                    age: "未知",
-                                    address: "未知"
-                                }
-                            });
-                        }
-                    })
-                    .catch(err => console.error("Fetch error:", err));
+        UserService.role_doctor()
+            .then((res) => {
+                if (res) {
+                    this.setState({ doctorInfo: res });
+                } else {
+                    this.setState({
+                        doctorInfo: {
+                            name: "未找到資料",
+                            email: "未知",
+                            gender: "未知",
+                            age: "未知",
+                            address: "未知",
+                        },
+                    });
+                }
+            })
+            .catch((err) => {
+                console.error("Fetch error:", err);
+                window.location.href = "/";
             });
     }
 

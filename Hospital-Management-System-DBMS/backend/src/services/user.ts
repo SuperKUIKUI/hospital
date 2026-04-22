@@ -74,5 +74,16 @@ const UserService = {
             .where("email", "=", email)
             .execute();
     },
+    async selectDoctor(
+        db: Kysely<DB>,
+        email: string,
+    ): Promise<Selectable<Doctor>[]> {
+        return await db
+            .selectFrom("Doctor")
+            .selectAll()
+            .limit(1)
+            .where("email", "=", email)
+            .execute();
+    },
 };
 export { UserService };
