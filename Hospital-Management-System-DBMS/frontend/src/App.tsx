@@ -8,7 +8,7 @@ import { Box } from "grommet";
 
 // 导入组件
 import Home from './Home';
-import LogIn from './logIn.tsx';
+import Login from './login.tsx';
 import CreateAccount from './CreateAccount.tsx';
 import SchedulingAppt from './schedulingAppt.tsx';
 import ViewMedHist from './ViewMedHist.tsx';
@@ -26,7 +26,7 @@ import DocStatistics from "./DocStatistics";
 import { UserService } from "./api/services/user.ts";
 
 export default function App() {
-  let [component, setComponent] = useState(<LogIn />)
+  let [component, setComponent] = useState(<Login />)
 
   useEffect(() => {
     UserService.verify()
@@ -37,12 +37,12 @@ export default function App() {
             } else if (role === 1) {
                 setComponent(<DocHome />);
             } else {
-                setComponent(<LogIn />);
+                setComponent(<Login />);
             }
         })
         .catch((err) => {
             console.error("Session fetch error:", err);
-            setComponent(<LogIn />);
+            setComponent(<Login />);
         });
   }, [])
 

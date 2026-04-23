@@ -79,7 +79,7 @@ const AppBar = (props:any) => (
 );
 
 // 2. 将类组件改为函数组件
-const LogIn = () => {
+const Login = () => {
   const [isDoctor, setIsDoctor] = useState(false); // 使用 useState 管理状态
   const navigate = useNavigate(); // 获取导航函数
 
@@ -189,4 +189,4 @@ const LogIn = () => {
   );
 };
 
-export default LogIn; // 4. 直接导出组件，不再需要 withRouter
+export default Login; // 4. 直接导出组件，不再需要 withRouter
