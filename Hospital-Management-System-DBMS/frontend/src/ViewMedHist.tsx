@@ -8,6 +8,7 @@ import {
   Text,
   TextInput,
   Main,
+  type ThemeType,
 } from 'grommet';
 import { Search, View, FormPreviousLink } from 'grommet-icons';
 
@@ -23,7 +24,7 @@ const InfoItem = ({ label, value }) => (
   </Box>
 );
 
-const theme = {
+const theme:ThemeType = {
   global: {
     colors: {
       brand: '#000000',

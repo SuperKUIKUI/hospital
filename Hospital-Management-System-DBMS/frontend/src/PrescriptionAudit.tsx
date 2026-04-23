@@ -5,10 +5,14 @@ export default function PrescriptionAudit({
   patient,
   diagnosis,
   prescription
+}:{
+  patient: any,
+  diagnosis: string,
+  prescription: string
 }) {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
+  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string|null>(null);
 
   const runAudit = () => {
     setLoading(true);

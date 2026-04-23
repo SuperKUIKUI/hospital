@@ -14,20 +14,10 @@ import {
 } from 'grommet';
 
 import './App.css';
+import type { CreateAccountFormValues } from './api/types/user';
+import { UserService } from './api/services/user';
 
-interface CreateAccountFormValues {
-  name: string;
-  gender: string;
-  age: string;
-  height: string;
-  weight: string;
-  conditions?: string;
-  surgeries?: string;
-  medications?: string;
-  address: string;
-  email: string;
-  password: string;
-}
+
 
 type AppBarProps = ComponentPropsWithoutRef<typeof Box>;
 
@@ -89,28 +79,14 @@ export class CreateAccount extends Component {
     const handleSubmit = ({ value }: { value: CreateAccountFormValues }) => {
       const formValue = value as CreateAccountFormValues;
 
-      fetch(`http://localhost:3001/checkIfPatientExists?email=${encodeURIComponent(formValue.email)}`)
-        .then(res => res.json())
-        .then(res => {
-          if (res.data[0]) {
-            window.alert('該郵箱已關聯現有賬戶 / EMAIL ALREADY EXISTS.');
-          } else {
-            fetch(
-              `http://localhost:3001/makeAccount?name=${encodeURIComponent(formValue.name)}` +
-              `&email=${encodeURIComponent(formValue.email)}` +
-              `&password=${encodeURIComponent(formValue.password)}` +
-              `&address=${encodeURIComponent(formValue.address)}` +
-              `&gender=${encodeURIComponent(formValue.gender)}` +
-              `&age=${encodeURIComponent(formValue.age)}` +
-              `&height=${encodeURIComponent(formValue.height)}` +
-              `&weight=${encodeURIComponent(formValue.weight)}` +
-              `&conditions=${encodeURIComponent(formValue.conditions ?? '')}` +
-              `&medications=${encodeURIComponent(formValue.medications ?? '')}` +
-              `&surgeries=${encodeURIComponent(formValue.surgeries ?? '')}`
-            )
-              .then(() => { window.location.href = '/Home'; });
-          }
-        });
+      UserService.register(formValue)
+          .then((res) => {
+            window.alert('註冊成功！');
+            window.location.href = "/login";
+          })
+          .catch((err) => {
+            window.alert('网络错误！');
+          });
     };
 
     return (

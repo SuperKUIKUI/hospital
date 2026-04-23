@@ -30,3 +30,17 @@ export interface DoctorInfo {
     name: string;
     password: string;
 }
+
+export interface CreateAccountFormValues {
+  name: string;
+  gender: string;
+  age: string;
+  height: string;
+  weight: string;
+  conditions?: string;
+  surgeries?: string;
+  medications?: string;
+  address: string;
+  email: string;
+  password: string;
+}

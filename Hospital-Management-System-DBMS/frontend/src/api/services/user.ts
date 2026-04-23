@@ -1,6 +1,6 @@
 // src/api/services/user.ts
 import apiClient from "../client";
-import type { DoctorInfo, PatientInfo } from "../types/user";
+import type { CreateAccountFormValues, DoctorInfo, PatientInfo } from "../types/user";
 
 export const UserService = {
     login: async (email: string, password: string): Promise<void> => {
@@ -26,6 +26,10 @@ export const UserService = {
             old_password,
             new_password,
         });
+        return req.data;
+    },
+    register: async (data: CreateAccountFormValues): Promise<any> => {
+        const req = await apiClient.post("/register", data);
         return req.data;
     },
 };

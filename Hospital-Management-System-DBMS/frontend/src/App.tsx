@@ -71,6 +71,7 @@ export default function App() {
           <Route path="/PatientsViewAppt" element={<PatientsViewAppt />} />
           <Route path="/DocSettings" element={<DocSettings />} />
           <Route path="/ApptList" element={<DocViewAppt />} />
+          <Route path="/login" element={<Login />} />
           
           {/* 根路由 */}
           <Route path="/" element={component} />
