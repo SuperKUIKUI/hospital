@@ -15,5 +15,6 @@ yarn-error.log*
 yarn.lock
 Data_Design
 backend/dist
+frontend/dist
 *.env
 *.pem

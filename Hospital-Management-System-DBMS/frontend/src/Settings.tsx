@@ -9,12 +9,14 @@ import {
   Grid,
   Text,
   TextInput,
-  Main
+  Main,
+  type ThemeType
 } from 'grommet';
 import { FormPreviousLink, ShieldSecurity, MailOption } from 'grommet-icons';
+import { UserService } from './api/services/user';
 
 // 統一硬核黑白主題配置
-const theme = {
+const theme:ThemeType = {
   global: {
     colors: {
       brand: '#000000',
@@ -45,15 +47,15 @@ const theme = {
 };
 
 export class Settings extends Component {
-  constructor(props) {
+  state = {
+    passwordMessage: '',
+    emailMessage: '',
+  }
+  constructor(props:any) {
     super(props);
-    this.state = {
-      passwordMessage: '',
-      emailMessage: '',
-    };
   }
 
-  showMessage(type, message) {
+  showMessage(type:string, message:string) {
     if (type === 'password') {
       this.setState({ passwordMessage: message });
       setTimeout(() => this.setState({ passwordMessage: '' }), 3000);
@@ -119,23 +121,15 @@ export class Settings extends Component {
                   </Box>
                   
                   <Form
-                    onSubmit={({ value }) => {
-                      fetch('http://localhost:3001/userInSession')
-                        .then(res => res.json())
-                        .then(res => {
-                          const email_in_use = res.email;
-                          fetch(
-                            `http://localhost:3001/resetPasswordPatient?email=${email_in_use}&oldPassword=${value.oldPassword}&newPassword=${value.newPassword}`,
-                            { method: 'POST' }
-                          )
-                            .then(res => res.json())
-                            .then(res => {
-                              if (res.data.affectedRows === 0) {
-                                this.showMessage('password', '舊密碼不正確。');
-                              } else {
-                                this.showMessage('password', '密碼修改成功！');
-                              }
-                            });
+                    onSubmit={({ value }:{value:any}) => {
+                        if(value.oldPassword === value.newPassword){
+                          return this.showMessage('password', '新舊密碼不能相同。');
+                        }
+
+                        UserService.change_pwd(value.oldPassword, value.newPassword).then(() => {
+                            this.showMessage('password', '密碼修改成功!');
+                        }).catch(() => {
+                            this.showMessage('password', '舊密碼不正確。');
                         });
                     }}
                   >
@@ -171,7 +165,7 @@ export class Settings extends Component {
                   </Box>
                   
                   <Form
-                    onSubmit={({ value }) => {
+                    onSubmit={({ value }:{value:any}) => {
                       fetch('http://localhost:3001/userInSession')
                         .then(res => res.json())
                         .then(res => {

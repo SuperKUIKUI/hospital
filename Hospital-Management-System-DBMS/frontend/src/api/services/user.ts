@@ -18,4 +18,14 @@ export const UserService = {
         const req = await apiClient.get("/role");
         return req.data;
     },
+    change_pwd: async (
+        old_password: string,
+        new_password: string,
+    ): Promise<any> => {
+        const req = await apiClient.post("/change_password", {
+            old_password,
+            new_password,
+        });
+        return req.data;
+    },
 };

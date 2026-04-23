@@ -83,17 +83,17 @@ auth.post("/login", async (c) => {
 });
 
 interface CreateAccountFormValues {
-  name: string;
-  gender: string;
-  age: number;
-  height: string;
-  weight: string;
-  conditions?: string;
-  surgeries?: string;
-  medications?: string;
-  address: string;
-  email: string;
-  password: string;
+    name: string;
+    gender: string;
+    age: number;
+    height: string;
+    weight: string;
+    conditions: string | null;
+    surgeries: string | null;
+    medications: string | null;
+    address: string;
+    email: string;
+    password: string;
 }
 
 auth.post("/verify", async (c) => {
@@ -155,6 +155,40 @@ auth.get("/role", async (c) => {
         }
         return c.json({});
     } catch (err: any) {
+        return c.json({ error: err.message }, 500);
+    }
+});
+
+auth.post('/change_password', async (c) => {
+    const db = c.get('db');
+    const payload = c.get("jwtPayload");
+
+    // 1. JWT 检测：确保用户已登录且 Token 有效
+    if (c.get("authStatus") !== "valid" || !payload) {
+        return c.json({ error: "Unauthorized: Missing or invalid token" }, 401);
+    }
+
+    const body = await c.req.json();
+
+    // 2. 修复类型错误：防御性检查，确保 old_password 和 new_password 为非空字符串
+    if (typeof body.old_password !== 'string' || typeof body.new_password !== 'string') {
+        return c.json({ error: "Invalid input: password fields must be strings" }, 400);
+    }
+
+    if (body.old_password === body.new_password){
+        return c.json({ error: "Invalid password: old password cannot be same with new password" },400);
+    }
+
+    // 3. 水平越权防御：忽略请求体中的 email，直接使用 JWT payload 中的 email
+    const email = payload.user.email;
+    const old_password_hash = await sha256(body.old_password) ?? "";
+    const new_password_hash = await sha256(body.new_password) ?? "";
+
+    try {
+        await UserService.changeUserPassword(db, email, old_password_hash, new_password_hash);
+        return c.json({ ok: "ok" });
+    } catch (err:any) {
+        console.error("Error changing password:", err);
         return c.json({ error: err.message }, 500);
     }
 });

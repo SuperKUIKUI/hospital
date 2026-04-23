@@ -13,6 +13,7 @@ import {
   type ThemeType,
 } from 'grommet';
 import { FormPreviousLink, ShieldSecurity, MailOption } from 'grommet-icons';
+import { UserService } from './api/services/user';
 
 const theme: ThemeType = {
   global: {
@@ -123,24 +124,17 @@ export class DocSettings extends Component<{}, DocSettingsState> {
                   
                   <Form
                     onSubmit={({ value }: { value: Record<string, string> }) => {
-                      fetch('http://localhost:3001/userInSession')
-                        .then(res => res.json())
-                        .then(res => {
-                          const email_in_use = res.email;
-                          fetch(
-                            `http://localhost:3001/resetPasswordDoctor?email=${email_in_use}&oldPassword=${value.oldPassword}&newPassword=${value.newPassword}`,
-                            { method: 'POST' }
-                          )
-                            .then(res => res.json())
-                            .then(res => {
-                              let didUpdate = res.data.affectedRows;
-                              if (didUpdate === 0) {
-                                this.showMessage('password', '舊密碼不正確。');
-                              } else {
-                                this.showMessage('password', '密碼重置成功！');
-                              }
-                            });
-                        });
+                      if (value.oldPassword === value.newPassword) {
+                          return this.showMessage("password", "新舊密碼不能相同。");
+                      }
+
+                      UserService.change_pwd(value.oldPassword, value.newPassword)
+                          .then(() => {
+                              this.showMessage("password", "密碼修改成功!");
+                          })
+                          .catch(() => {
+                              this.showMessage("password", "舊密碼不正確。");
+                          });
                     }}
                   >
                     <FormField label="舊密碼 / OLD PASSWORD" name="oldPassword" required>

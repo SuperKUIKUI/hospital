@@ -84,7 +84,7 @@ export default class ViewOneHistory extends Component {
 
     // --- 动态逻辑点 ---
     // 根据身份决定返回路径：医生回 MedHistView，病人回 PatientHome
-    const backPath = who === "doc" ? "/MedHistView" : "/PatientHome";
+    const backPath = who === "doc" ? "/MedHistView" : "/Home";
     const backLabel = who === "doc" ? "返回列表 / BACK" : "返回首页 / HOME";
 
     return (
